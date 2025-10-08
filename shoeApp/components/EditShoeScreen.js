@@ -14,7 +14,6 @@ import {
 import { shoeService } from './shoeService';
 
 const EditShoeScreen = ({ route, navigation }) => {
-  // Lấy dữ liệu sản phẩm từ navigation params
   const { shoe } = route.params;
 
   const [loading, setLoading] = useState(false);
@@ -22,8 +21,8 @@ const EditShoeScreen = ({ route, navigation }) => {
     productCode: shoe.productCode || '',
     productName: shoe.productName || '',
     size: shoe.size || null, 
-    price: String(shoe.price || ''), // Chuyển sang string cho TextInput
-    quantity: String(shoe.quantity || ''), // Chuyển sang string cho TextInput
+    price: String(shoe.price || ''),
+    quantity: String(shoe.quantity || ''),
   });
 
   const availableSizes = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -58,45 +57,33 @@ const EditShoeScreen = ({ route, navigation }) => {
   let shouldNavigateBack = false;
   const successMessage = 'Đã cập nhật sản phẩm';
   try {
-      // Dữ liệu chỉ cập nhật các trường đã thay đổi, 
-      // đồng thời chuyển price và quantity thành Number trước khi gửi (nếu API cần number)
-      // Trong trường hợp mock service, chúng ta sẽ gửi String (xem phần service).
-      const dataToUpdate = {
+        const dataToUpdate = {
         ...formData,
         price: formData.price,
         quantity: formData.quantity,
       };
 
       const response = await shoeService.updateShoe(shoe.id, dataToUpdate);
-
-      // Treat any 2xx status as success so we show the success alert
       if (response && response.status >= 200 && response.status < 300) {
-        // Defer navigation/notification until loading is cleared in finally
         shouldNavigateBack = true;
       } else if (response && response.status === 404) {
         Alert.alert('Lỗi', 'Không tìm thấy sản phẩm để cập nhật.');
       } else {
-        // Show returned status/body for easier debugging
         const bodyText = response && response.data ? JSON.stringify(response.data) : 'Không có nội dung phản hồi';
         Alert.alert('Lỗi', `Không thể cập nhật sản phẩm (Status: ${response?.status})\n${bodyText}`);
       }
     } catch (error) {
       Alert.alert('Lỗi', 'Đã xảy ra lỗi khi cập nhật sản phẩm.');
     } finally {
-      // Clear loading first
       setLoading(false);
-
-      // If update succeeded, show a platform-appropriate success notification
       if (shouldNavigateBack) {
         if (Platform.OS === 'android') {
           ToastAndroid.show(successMessage, ToastAndroid.SHORT);
           navigation.goBack();
         } else if (Platform.OS === 'web') {
-          // window.alert is acceptable for web builds
           alert(successMessage);
           navigation.goBack();
         } else {
-          // iOS and other platforms: show Alert with OK button before navigating
           Alert.alert('Thành công', successMessage, [
             { text: 'OK', onPress: () => navigation.goBack() },
           ]);
@@ -187,8 +174,6 @@ const EditShoeScreen = ({ route, navigation }) => {
 };
 
 export default EditShoeScreen;
-
-// Sử dụng lại styles từ AddShoeScreen
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -265,7 +250,6 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
-    // Màu nút cập nhật là màu xanh dương, khác với Thêm mới (xanh lá) để dễ phân biệt
     submitButton: { 
         backgroundColor: '#007AFF', 
         paddingVertical: 15,

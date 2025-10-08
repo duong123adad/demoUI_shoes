@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-// Đảm bảo đường dẫn này đúng trong dự án của bạn
 import { shoeService } from '../components/shoeService';
 
 const AddShoeScreen = ({ navigation }) => {
@@ -65,27 +64,20 @@ const AddShoeScreen = ({ navigation }) => {
         quantity: Number(formData.quantity),
       };
 
-      const response = await shoeService.createShoe(dataToSend);
-      
+      const response = await shoeService.createShoe(dataToSend);   
       if (response.status === 201) {
-        
-        // Hiển thị thông báo và quay lại dựa trên nền tảng
         if (Platform.OS === 'android') {
-          // Toast ngắn cho Android
           ToastAndroid.show(successMessage, ToastAndroid.SHORT);
           navigation.goBack();
         } else if (Platform.OS === 'web') {
-          // Alert đơn giản cho Web
           alert(successMessage);
           navigation.goBack();
         } else {
-          // iOS và các nền tảng khác: hiển thị Alert với nút OK
           Alert.alert('Thành công', successMessage, [
             { text: 'OK', onPress: () => navigation.goBack() },
           ]);
         }
       } else {
-        // Trường hợp API trả về status không phải 201
         Alert.alert('Lỗi', `Không thể thêm sản phẩm (Status: ${response?.status})`);
       }
     } catch (error) {
